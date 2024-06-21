@@ -9,7 +9,7 @@ import useTransaction from "./store/hooks/useTransaction";
 
 function App() {
   const [{ wallet, connecting }, connect, disconnect] = useConnectWallet();
-  const { sendErc20,getErc20Balance } = useTransaction();
+  const { sendErc20,getErc20Balance ,getTotalBalance} = useTransaction();
   const balance = useBalance();
   useEffect(() => {
     if (wallet) {
@@ -77,6 +77,19 @@ function App() {
             }}
           >
             send
+          </button>
+        )}
+                {wallet && (
+          <button
+            onClick={async () => {
+             try{
+              console.log('Total Supply : ',await getTotalBalance("0xF9131A2ba743Eb3C2Dc62dA2EF289BaAD9Ee8A66"));
+             }catch(e){
+               console.log('Error',e);
+             }
+            }}
+          >
+            Get Total Supply
           </button>
         )}
         <p>

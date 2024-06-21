@@ -34,9 +34,20 @@ const useTransaction = () => {
   };
 
 
+  const getTotalBalance = async (tokenAddress:`0x${string}`) => {
+    const result = await readContract(wagmiConfig, {
+      abi,
+      address: tokenAddress,
+      functionName: 'totalSupply',
+    })
+    return result;
+  };
+
+
   return {
     sendErc20,
-    getErc20Balance
+    getErc20Balance,
+    getTotalBalance
   };
 };
 
