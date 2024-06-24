@@ -2,8 +2,42 @@ import injectedModule from '@web3-onboard/injected-wallets'
 import { init } from '@web3-onboard/react'
 import icon from "../assets/react.svg"
 import wagmi from '@web3-onboard/wagmi'
-// Import the blocknative icon
+import metamaskSDK from '@web3-onboard/metamask'
+import walletConnectModule from '@web3-onboard/walletconnect'
 
+const WC_PROJECT_ID = import.meta.env.VITE_APP_WALLET_CONNECT_ID;
+const wcInitOptions = {
+  /**
+   * Project ID associated with [WalletConnect account](https://cloud.walletconnect.com)
+   */
+  projectId: WC_PROJECT_ID,
+  /**
+   * Chains required to be supported by all wallets connecting to your DApp
+   */
+  requiredChains: [51],
+  /**
+   * Chains required to be supported by all wallets connecting to your DApp
+   */
+  optionalChains: [51],
+  /**
+   * Defaults to `appMetadata.explore` that is supplied to the web3-onboard init
+   * Strongly recommended to provide atleast one URL as it is required by some wallets (i.e. MetaMask)
+   * To connect with WalletConnect
+   */
+  dappUrl: 'http://YourAwesomeDapp.com'
+}
+
+// initialize the module with options
+const walletConnect = walletConnectModule(wcInitOptions)
+
+
+// Import the blocknative icon
+const metamaskSDKWallet = metamaskSDK({options: {
+  extensionOnly: false,
+  dappMetadata: {
+    name: 'Demo Web3Onboard'
+  }
+}})
 
 const injected = injectedModule({
   custom: [
@@ -19,6 +53,8 @@ export default init({
   wagmi,
   // An array of wallet modules that you would like to be presented to the user to select from when connecting a wallet.
   wallets: [
+    // metamaskSDKWallet,
+    walletConnect,
     injected,
   ],
   // An array of Chains that your app supports

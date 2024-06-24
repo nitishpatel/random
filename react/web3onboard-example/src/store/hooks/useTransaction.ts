@@ -1,8 +1,7 @@
 import { useWeb3Store } from '../web3store';
 
 import abi from "../../abi/erc20.json";
-import {  readContract, waitForTransactionReceipt, writeContract } from '@web3-onboard/wagmi';
-
+import {  multicall, readContract, waitForTransactionReceipt, writeContract } from '@web3-onboard/wagmi';
 
 const useTransaction = () => {
   const {wagmiConfig} = useWeb3Store();
@@ -23,13 +22,16 @@ const useTransaction = () => {
   };
 
   const getErc20Balance = async (tokenAddress:`0x${string}`, address:string) => {
-    const customConfig = wagmiConfig;
-    customConfig.chains[0].contracts.multicall3.address = "0x1574aE4d1C2E93D3AfF58b19DA2c481F68802E17";
-    const result = await readContract(customConfig, {
-      abi,
-      address: tokenAddress,
-      functionName: 'balanceOf',
-      args: [address]
+    const result = await multicall(wagmiConfig, {
+    contracts:[
+      {
+        address: tokenAddress,
+        abi: abi,
+        functionName: 'balanceOf',
+        args: [address]
+      }
+    ],
+    multicallAddress:'0x1574aE4d1C2E93D3AfF58b19DA2c481F68802E17'
     })
     return result;
   };

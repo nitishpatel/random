@@ -19,7 +19,7 @@ export const useWeb3Store = create<Web3Store>()(
   devtools(
     persist(
       (set,get) => ({
-        wagmiConfig: {},
+        wagmiConfig: null,
         account: null,
         chainId: '',
         wallet: null,

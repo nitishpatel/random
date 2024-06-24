@@ -13,10 +13,11 @@ function App() {
   const balance = useBalance();
   useEffect(() => {
     if (wallet) {
-      console.log("wallet", wallet);
+      console.log("setting key", wallet);
       localStorage.setItem("wallet", wallet.label);
     } else {
       // Check if wallet is stored in local storage
+      console.log("checking local storage");
       const localStorageWallet = localStorage.getItem("wallet");
       if (localStorageWallet) {
         connect({
@@ -33,6 +34,7 @@ function App() {
     if (wallet) {
       console.log("wallet", wallet);
       setConnectWallet(wallet);
+      localStorage.setItem("wallet", wallet.label);
     }
   }, [wallet]);
   return (
