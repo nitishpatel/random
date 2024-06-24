@@ -23,12 +23,13 @@ const useTransaction = () => {
   };
 
   const getErc20Balance = async (tokenAddress:`0x${string}`, address:string) => {
-    // let customConfig = wagmiConfig;
-    // customConfig.chains[0].rpcUrls.default.http = ['https://rpc.ankr.com/xdc_testnet'];
-    const result = await readContract(wagmiConfig, {
+    const customConfig = wagmiConfig;
+    customConfig.chains[0].contracts.multicall3.address = "0x1574aE4d1C2E93D3AfF58b19DA2c481F68802E17";
+    const result = await readContract(customConfig, {
       abi,
       address: tokenAddress,
-      functionName: 'totalSupply',
+      functionName: 'balanceOf',
+      args: [address]
     })
     return result;
   };

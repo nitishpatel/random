@@ -26,7 +26,6 @@ export const useWeb3Store = create<Web3Store>()(
         balance: '0',
         onBoard: onboard,
         setConnectWallet: async(connectedWallet) => {
-          console.log('connectWallet',connectedWallet.accounts[0]);
           set({
             wallet: connectedWallet,
             account: connectedWallet.accounts[0]['address'],
