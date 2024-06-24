@@ -1,20 +1,22 @@
 import { useEffect } from 'react';
 import { useWeb3Store } from '../web3store';
+import { useQuery } from 'react-query';
 
 const useBalance = () => {
+  // Get the fetchBalance function from the store
   const fetchBalance = useWeb3Store((state) => state.pollBalance);
-  const {balance} = useWeb3Store();
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchBalance();
-    }, 5000);
+  // Get the current balance from the store
+  const { balance } = useWeb3Store();
 
-    // Cleanup interval on component unmount
-    return () => clearInterval(interval);
-  }, [fetchBalance]);
+  // Setup react-query to fetch the balance periodically
+  const query = useQuery('balance', fetchBalance, {
+    refetchInterval: 5000,
+    enabled: !!fetchBalance,
+  });
 
-  return balance;
+  // Return the queried balance or the balance from the store
+  return query.data || balance;
 };
 
 export default useBalance;

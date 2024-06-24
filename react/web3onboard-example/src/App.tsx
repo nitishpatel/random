@@ -6,11 +6,13 @@ import { useConnectWallet } from "@web3-onboard/react";
 import { useWeb3Store } from "./store/web3store";
 import useBalance from "./store/hooks/useBalance";
 import useTransaction from "./store/hooks/useTransaction";
+import Navbar from "./components/Navbar";
 
 function App() {
-  const [{ wallet, connecting }, connect, disconnect] = useConnectWallet();
-  const { sendErc20,getErc20Balance ,getTotalBalance} = useTransaction();
-  const balance = useBalance();
+  const [{ wallet, connecting }, connect ] = useConnectWallet();
+  const { sendErc20,getErc20Balance,txnInProgress} = useTransaction();
+  const [balance, setBalance] = useState("0");
+  const [receipt, setReceipt] = useState("");
   useEffect(() => {
     if (wallet) {
       console.log("setting key", wallet);
@@ -29,16 +31,18 @@ function App() {
       }
     }
   }, []);
-  const { setConnectWallet, account, disconnectWallet } = useWeb3Store();
+  const { setConnectWallet, account } = useWeb3Store();
   useEffect(() => {
     if (wallet) {
       console.log("wallet", wallet);
       setConnectWallet(wallet);
       localStorage.setItem("wallet", wallet.label);
+      localStorage.setItem("onboard.js:last_connected_wallet",JSON.stringify({label:wallet.label})); // BUG: onboard.js does not store wallet in local storage
     }
   }, [wallet]);
   return (
     <div className="App">
+      <Navbar />
       <h2>
         {connecting
           ? "Connecting..."
@@ -47,53 +51,54 @@ function App() {
           : "Not connected"}
       </h2>
       <div className="card">
-        {account && <p>Account: {account}</p>}
-        {balance && <p>Balance: {balance}</p>}
-        {!wallet && <button onClick={() => connect()}>connect</button>}
-        <button
-          onClick={() => {
-            console.log("disconnect", wallet?.label);
-            if (wallet?.label) {
-              disconnect({ label: wallet.label });
-              disconnectWallet();
-            }
-          }}
-        >
-          disconnect
-        </button>
-
+        <div>
+          <h2>ERC20 - Contract Address: 0x1b9b08a75881CE738EE8eEC07e864C04bdA4667A</h2>
+          {balance && balance!=="0" && <h3>My Balance: {balance}</h3>}
+        </div>
         {wallet && (
           <button
             onClick={async () => {
              try{
-              console.log('Amount before',await getErc20Balance("0xF9131A2ba743Eb3C2Dc62dA2EF289BaAD9Ee8A66","0x3c2070a2e512dd97881df8fa0af8f9889872fcad"));
-              await sendErc20(
-                "0xF9131A2ba743Eb3C2Dc62dA2EF289BaAD9Ee8A66",
-                "0x3c2070a2e512dd97881df8fa0af8f9889872fcad",
-                "10000000"
+             const res =  await sendErc20(
+                "0x1b9b08a75881CE738EE8eEC07e864C04bdA4667A",
+                "0xB247cdE9C6A635d3F9FAdeF01F058D327f58fd00",
+                "1000000"
               );
-              // console.log('Amount after',await getErc20Balance("0x1b9b08a75881CE738EE8eEC07e864C04bdA4667A","0xB247cdE9C6A635d3F9FAdeF01F058D327f58fd00"));
+              setReceipt(res.transactionHash);
+              setTimeout(async()=>{
+                setReceipt('')
+              },5000);
              }catch(e){
                console.log('Error',e);
              }
             }}
+            className="gradient-button"
           >
-            send
+            {txnInProgress ? "Sending..." : "Send"}
           </button>
         )}
                 {wallet && (
           <button
+          className="gradient-button"
             onClick={async () => {
              try{
-              console.log('Total Supply : ',await getTotalBalance("0xF9131A2ba743Eb3C2Dc62dA2EF289BaAD9Ee8A66"));
+              const result = await getErc20Balance("0x1b9b08a75881CE738EE8eEC07e864C04bdA4667A",account!);
+              console.log('Amount',result);
+            const formattedBalance = result[0]?.result as bigint/ BigInt(10**6);
+              setBalance(formattedBalance.toString());
+              setTimeout(async()=>{
+                setBalance('0')
+              },5000);
              }catch(e){
                console.log('Error',e);
              }
             }}
           >
-            Get Total Supply
+            Get My Balance
           </button>
         )}
+
+        {receipt && <h3>Transaction Hash: {JSON.stringify(receipt)}</h3>}
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>

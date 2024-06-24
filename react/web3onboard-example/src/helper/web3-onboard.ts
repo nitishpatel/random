@@ -53,7 +53,7 @@ export default init({
   wagmi,
   // An array of wallet modules that you would like to be presented to the user to select from when connecting a wallet.
   wallets: [
-    // metamaskSDKWallet,
+    metamaskSDKWallet,
     walletConnect,
     injected,
   ],
